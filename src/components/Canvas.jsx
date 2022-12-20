@@ -1,17 +1,17 @@
 import React from "react";
 
 function Canvas(props) {
-  let canvasWidth = 500; // Width in meters
-  let canvasHeight = 500; // Height in meters
+  const canvasWidth = 500; // Width in meters
+  const canvasHeight = 500; // Height in meters
 
-  let noFlyZoneRadius = 100; // Radius of NDZ in meters
+  const noFlyZoneRadius = 100; // Radius of NDZ in meters
 
-  let nestPositionX = 250000;
-  let nestPositionY = 250000;
+  const nestPositionX = 250000;
+  const nestPositionY = 250000;
 
   React.useEffect(() => {
-    var canvas = document.getElementById("myCanvas");
-    var context = canvas.getContext("2d");
+    const canvas = document.getElementById("myCanvas");
+    const context = canvas.getContext("2d");
 
     // Mark no-fly zone
     context.beginPath();
@@ -40,7 +40,7 @@ function Canvas(props) {
 
   return (
     <div>
-      <h1>Drone positions next to the Monadikuikka nest</h1>
+      <h1>Drone positions next to the Monadikuikka nest now</h1>
       <canvas
         id="myCanvas"
         width={canvasWidth}

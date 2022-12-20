@@ -1,5 +1,6 @@
 import React from "react";
 import Canvas from "./components/Canvas";
+import PilotsList from "./components/PilotsList";
 import "./App.css";
 
 function App() {
@@ -60,11 +61,35 @@ function App() {
     },
   };
 
+  const testPilotsData = {
+    pilots: [
+      {
+        pilotId: "P-XsmNQj095C",
+        firstName: "Zelma",
+        lastName: "Haley",
+        phoneNumber: "+210453777022",
+        createdDt: "2022-01-11T07:11:41.313Z",
+        email: "zelma.haley@example.com",
+        closest_distanse_m: 10,
+      },
+      {
+        pilotId: "Ö-XsmNQj095C",
+        firstName: "Zelma",
+        lastName: "Haley",
+        phoneNumber: "+210453777022",
+        createdDt: "2022-01-11T07:11:41.313Z",
+        email: "zelma.haley@example.com",
+        closest_distanse_m: 11,
+      },
+    ],
+  };
+
   React.useEffect(() => {}, []);
 
   return (
     <div>
       <Canvas data={testData} />
+      <PilotsList data={testPilotsData} />
     </div>
   );
 }
