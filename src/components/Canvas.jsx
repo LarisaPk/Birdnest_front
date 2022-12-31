@@ -31,7 +31,7 @@ function Canvas(props) {
 
   return (
     <div>
-      <h2>Drone positions next to the Monadikuikka nest now</h2>
+      <h2>Drones next to the Monadikuikka nest now</h2>
       <canvas id="myCanvas" width={canvasWidth} height={canvasHeight} style={{ border: "2px solid #d3d3d3" }}>
         Your browser does not support the HTML canvas tag.
       </canvas>
