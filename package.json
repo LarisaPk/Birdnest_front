@@ -3,13 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "./src/main.jsx",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
-    "lint": "eslint \"src/**/*.{js,jsx}\" --quiet",
-    "main": "src/main.jsx"
+    "lint": "eslint \"src/**/*.{js,jsx}\" --quiet"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
