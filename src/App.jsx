@@ -4,8 +4,8 @@ import PilotsList from "./components/PilotsList";
 import axios from "axios";
 import "./App.css";
 
-const dronesApi = "http://localhost:3001/api/drones/now";
-const pilotsApi = "http://localhost:3001/api/pilots";
+const DRONESAPI = process.env.DRONESAPI || "http://localhost:3001/api/drones/now";
+const PILOTSAPI = process.env.PILOTSAPI || "http://localhost:3001/api/pilots";
 
 function App() {
   const [allDrones, setAllDrones] = React.useState([]);
@@ -23,7 +23,7 @@ function App() {
 
     let interval = setInterval(() => {
       axios
-        .get(dronesApi, {
+        .get(DRONESAPI, {
           cancelToken: source.token,
         })
         .then((response) => {
@@ -66,7 +66,7 @@ function App() {
     // fetching data every 2 seconds
     let interval = setInterval(() => {
       axios
-        .get(pilotsApi, {
+        .get(PILOTSAPI, {
           cancelToken: source.token,
         })
         .then((response) => {
