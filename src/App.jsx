@@ -3,10 +3,7 @@ import Canvas from "./components/Canvas";
 import PilotsList from "./components/PilotsList";
 import axios from "axios";
 import "./App.css";
-
-/*
-Used for development:
-
+/*Used for development:
 const DRONESAPI = "http://localhost:3001/api/drones/now";
 const PILOTSAPI = "http://localhost:3001/api/pilots";
 */
@@ -18,6 +15,17 @@ function App() {
   const [allDrones, setAllDrones] = React.useState([]);
   const [pilots, setPilots] = React.useState([]);
 
+  // Organising pilots alphabetically by Lastname. used like this: obj.sort( compare );
+  function compare(a, b) {
+    if (a.lastName < b.lastName) {
+      return -1;
+    }
+    if (a.lastName > b.lastName) {
+      return 1;
+    }
+    return 0;
+  }
+
   React.useEffect(() => {
     console.log("All Drones effect");
 
@@ -28,7 +36,8 @@ function App() {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    let interval = setInterval(() => {
+    // fetching data after state changes with 2 seconds delay
+    let timer = setTimeout(() => {
       axios
         .get(DRONESAPI, {
           cancelToken: source.token,
@@ -52,13 +61,13 @@ function App() {
       // cancel the subscription
       // It will not try to update the state on an unmounted component
       isApiSubscribed = false;
-      // clear the interval to avoid memory leaks
-      // (if the component unmounts before the interval expires and we don't clear the interval, we would have a memory leak)
-      clearInterval(interval);
+      // clear the timer to avoid memory leaks
+      // (if the component unmounts before the timer expires)
+      clearTimeout(timer);
       // cancel the request before component unmounts
       source.cancel();
     };
-  }, []);
+  }, [allDrones]);
 
   React.useEffect(() => {
     console.log("Pilots in NDZ effect");
@@ -70,7 +79,7 @@ function App() {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    // fetching data every 2 seconds
+    // fetching data every 10 seconds
     let interval = setInterval(() => {
       axios
         .get(PILOTSAPI, {
@@ -80,7 +89,7 @@ function App() {
           if (isApiSubscribed) {
             // handle success
             console.log("promise fulfilled pilots");
-            setPilots(response.data);
+            setPilots(response.data.sort(compare));
           }
         })
         .catch((error) => {
@@ -90,13 +99,13 @@ function App() {
             console.log(error);
           }
         });
-    }, 2000);
+    }, 10000);
     return () => {
       // cancel the subscription
       // It will not try to update the state on an unmounted component
       isApiSubscribed = false;
       // clear the interval to avoid memory leaks
-      // (if the component unmounts before the interval expires and we don't clear the interval, we would have a memory leak)
+      // (if the component unmounts before the interval expires)
       clearInterval(interval);
       // cancel the request before component unmounts
       source.cancel();
