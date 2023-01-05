@@ -4,13 +4,14 @@ import PilotsList from "./components/PilotsList";
 import axios from "axios";
 import "./App.css";
 
+/*Used for development:
 const DRONESAPI = "http://localhost:3001/api/drones/now";
 const PILOTSAPI = "http://localhost:3001/api/pilots";
+*/
 
-/*Used for development:
 const DRONESAPI = "https://birdnest-backend.cyclic.app/api/drones/now";
 const PILOTSAPI = "https://birdnest-backend.cyclic.app/api/pilots";
-*/
+
 function App() {
   const [allDrones, setAllDrones] = React.useState([]);
   const [pilots, setPilots] = React.useState([]);
