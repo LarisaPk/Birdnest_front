@@ -3,17 +3,18 @@ import Canvas from "./components/Canvas";
 import PilotsList from "./components/PilotsList";
 import axios from "axios";
 import "./App.css";
-/*Used for development:
+
 const DRONESAPI = "http://localhost:3001/api/drones/now";
 const PILOTSAPI = "http://localhost:3001/api/pilots";
-*/
 
+/*Used for development:
 const DRONESAPI = "https://birdnest-backend.cyclic.app/api/drones/now";
 const PILOTSAPI = "https://birdnest-backend.cyclic.app/api/pilots";
-
+*/
 function App() {
   const [allDrones, setAllDrones] = React.useState([]);
   const [pilots, setPilots] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
   // Organising pilots alphabetically by Lastname. used like this: obj.sort( compare );
   function compare(a, b) {
@@ -46,7 +47,7 @@ function App() {
           if (isApiSubscribed) {
             // handle success
             console.log("promise fulfilled drones");
-            setAllDrones(response.data.report.capture.drone);
+            setAllDrones(response.data);
           }
         })
         .catch((error) => {
@@ -71,6 +72,7 @@ function App() {
 
   React.useEffect(() => {
     console.log("Pilots in NDZ effect");
+    setLoading(true);
 
     // Used to cancel the subscription
     let isApiSubscribed = true;
@@ -90,6 +92,7 @@ function App() {
             // handle success
             console.log("promise fulfilled pilots");
             setPilots(response.data.sort(compare));
+            setLoading(false);
           }
         })
         .catch((error) => {
@@ -99,7 +102,7 @@ function App() {
             console.log(error);
           }
         });
-    }, 10000);
+    }, 5000);
     return () => {
       // cancel the subscription
       // It will not try to update the state on an unmounted component
@@ -115,7 +118,7 @@ function App() {
   return (
     <div>
       <Canvas allDrones={allDrones} />
-      <PilotsList pilots={pilots} />
+      <PilotsList pilots={pilots} loading={loading} />
     </div>
   );
 }
