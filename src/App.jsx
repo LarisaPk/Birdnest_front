@@ -3,7 +3,6 @@ import Canvas from "./components/Canvas";
 import PilotsList from "./components/PilotsList";
 import axios from "axios";
 import "./App.css";
-
 /*Used for development:
 const DRONESAPI = "http://localhost:3001/api/drones/now";
 const PILOTSAPI = "http://localhost:3001/api/pilots";
@@ -15,21 +14,36 @@ const PILOTSAPI = "https://birdnest-backend.cyclic.app/api/pilots";
 function App() {
   const [allDrones, setAllDrones] = React.useState([]);
   const [pilots, setPilots] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
+  const [loadingPilots, setLoadingPilots] = React.useState(false);
+  const [loadingDrones, setLoadingDrones] = React.useState(false);
 
-  // Organising pilots alphabetically by Lastname. used like this: obj.sort( compare );
-  function compare(a, b) {
-    if (a.lastName < b.lastName) {
-      return -1;
+  // Generic function for fetching data and settitng it to state
+  const fetchData = async (url, source, isApiSubscribed, SetState) => {
+    try {
+      const { data } = await axios({
+        method: "get",
+        url: url,
+        cancelToken: source.token,
+      });
+      if (isApiSubscribed) {
+        // handle success
+        console.log("promise fulfilled");
+        SetState(data);
+        return data;
+      }
+    } catch (e) {
+      if (axios.isCancel(e)) {
+        console.log("successfully aborted");
+      } else {
+        console.log(e);
+      }
     }
-    if (a.lastName > b.lastName) {
-      return 1;
-    }
-    return 0;
-  }
+  };
 
+  // Only fires once on first render
   React.useEffect(() => {
-    console.log("All Drones effect");
+    console.log("All Drones effect, first render");
+    setLoadingDrones(true);
 
     // Used to cancel the subscription
     let isApiSubscribed = true;
@@ -38,27 +52,38 @@ function App() {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
+    // To be able to set loading to false whed data is ready
+    async function asyncCall() {
+      const result = fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
+      if (result) {
+        setLoadingDrones(false);
+      }
+    }
+    asyncCall();
+
+    return () => {
+      // cancel the subscription
+      // It will not try to update the state on an unmounted component
+      isApiSubscribed = false;
+      // cancel the request before component unmounts
+      source.cancel();
+    };
+  }, []);
+
+  // Fires every time allDrones state changes
+  React.useEffect(() => {
+    console.log("All Drones effect");
+
+    let isApiSubscribed = true;
+
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+
     // fetching data after state changes with 2 seconds delay
     let timer = setTimeout(() => {
-      axios
-        .get(DRONESAPI, {
-          cancelToken: source.token,
-        })
-        .then((response) => {
-          if (isApiSubscribed) {
-            // handle success
-            console.log("promise fulfilled drones");
-            setAllDrones(response.data);
-          }
-        })
-        .catch((error) => {
-          if (axios.isCancel(error)) {
-            console.log("successfully aborted");
-          } else {
-            console.log(error);
-          }
-        });
+      fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
     }, 2000);
+
     return () => {
       // cancel the subscription
       // It will not try to update the state on an unmounted component
@@ -71,39 +96,32 @@ function App() {
     };
   }, [allDrones]);
 
+  // Fires on first render, then with 10 seconds intervals
+  //(If updates needed more often, use setTimeout the same way as for Drones. So all api calls get to be resolved.)
   React.useEffect(() => {
     console.log("Pilots in NDZ effect");
-    setLoading(true);
+    setLoadingPilots(true);
 
-    // Used to cancel the subscription
     let isApiSubscribed = true;
+    let firstRender = true;
+    let interval;
 
-    // Used to cancel fetch request calls
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    // fetching data every 10 seconds
-    let interval = setInterval(() => {
-      axios
-        .get(PILOTSAPI, {
-          cancelToken: source.token,
-        })
-        .then((response) => {
-          if (isApiSubscribed) {
-            // handle success
-            console.log("promise fulfilled pilots");
-            setPilots(response.data.sort(compare));
-            setLoading(false);
-          }
-        })
-        .catch((error) => {
-          if (axios.isCancel(error)) {
-            console.log("successfully aborted");
-          } else {
-            console.log(error);
-          }
-        });
-    }, 5000);
+    if (firstRender) {
+      fetchData(PILOTSAPI, source, isApiSubscribed, setPilots, setLoadingPilots, false);
+      firstRender = false;
+      setLoadingPilots(false);
+    }
+
+    if (!firstRender) {
+      // fetching data every 10 seconds after first render
+      interval = setInterval(() => {
+        fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
+      }, 10000);
+    }
+
     return () => {
       // cancel the subscription
       // It will not try to update the state on an unmounted component
@@ -118,8 +136,8 @@ function App() {
 
   return (
     <div>
-      <Canvas allDrones={allDrones} />
-      <PilotsList pilots={pilots} loading={loading} />
+      {loadingDrones ? <h2>Loading...</h2> : <Canvas allDrones={allDrones} />}
+      {loadingPilots ? <h2>Loading...</h2> : <PilotsList pilots={pilots} />}
     </div>
   );
 }
