@@ -16,6 +16,7 @@ function App() {
   const [pilots, setPilots] = React.useState([]);
   const [loadingPilots, setLoadingPilots] = React.useState(false);
   const [loadingDrones, setLoadingDrones] = React.useState(false);
+  const [pilotsNotReady, setPilotsNotReady] = React.useState(false); // when there is no pilots in NDZ. for ex. on first render
 
   // Generic function for fetching data and settitng it to state
   const fetchData = async (url, source, isApiSubscribed, SetState) => {
@@ -34,17 +35,21 @@ function App() {
     } catch (e) {
       if (axios.isCancel(e)) {
         console.log("successfully aborted");
-      } else {
+      } else if (e.response.data.error === "pilots data is not ready yet") {
+        setPilotsNotReady(true);
         console.log(e);
+        console.log(e.response.data.error);
+        return e.response.data.error;
       }
     }
   };
 
   // Only fires once on first render
   React.useEffect(() => {
-    console.log("All Drones effect, first render");
+    console.log("First render Drones, Pilots effect");
     setLoadingDrones(true);
-
+    setLoadingPilots(true);
+    setPilotsNotReady(false);
     // Used to cancel the subscription
     let isApiSubscribed = true;
 
@@ -54,9 +59,13 @@ function App() {
 
     // To be able to set loading to false whed data is ready
     async function asyncCall() {
-      const result = fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
-      if (result) {
+      const drones = await fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
+      if (drones) {
         setLoadingDrones(false);
+      }
+      const pilots = await fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
+      if (pilots) {
+        setLoadingPilots(false);
       }
     }
     asyncCall();
@@ -72,7 +81,7 @@ function App() {
 
   // Fires every time allDrones state changes
   React.useEffect(() => {
-    console.log("All Drones effect");
+    console.log("Drones effect, state change");
 
     let isApiSubscribed = true;
 
@@ -96,48 +105,38 @@ function App() {
     };
   }, [allDrones]);
 
-  // Fires on first render, then with 10 seconds intervals
-  //(If updates needed more often, use setTimeout the same way as for Drones. So all api calls get to be resolved.)
+  // Fires every time pilots state changes
   React.useEffect(() => {
-    console.log("Pilots in NDZ effect");
-    setLoadingPilots(true);
+    console.log("Pilots effect, state change");
+    setPilotsNotReady(false);
 
     let isApiSubscribed = true;
-    let firstRender = true;
-    let interval;
 
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    if (firstRender) {
-      fetchData(PILOTSAPI, source, isApiSubscribed, setPilots, setLoadingPilots, false);
-      firstRender = false;
-      setLoadingPilots(false);
-    }
-
-    if (!firstRender) {
-      // fetching data every 10 seconds after first render
-      interval = setInterval(() => {
-        fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
-      }, 10000);
-    }
+    // fetching data after state changes with 10 seconds delay
+    // (Should be enough to get regular updates for the pilots list. If needed more often, decrease timeout)
+    let timer = setTimeout(() => {
+      fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
+    }, 10000);
 
     return () => {
       // cancel the subscription
       // It will not try to update the state on an unmounted component
       isApiSubscribed = false;
-      // clear the interval to avoid memory leaks
-      // (if the component unmounts before the interval expires)
-      clearInterval(interval);
+      // clear the timer to avoid memory leaks
+      // (if the component unmounts before the timer expires)
+      clearTimeout(timer);
       // cancel the request before component unmounts
       source.cancel();
     };
-  }, []);
+  }, [pilots]);
 
   return (
     <div>
       {loadingDrones ? <h2>Loading...</h2> : <Canvas allDrones={allDrones} />}
-      {loadingPilots ? <h2>Loading...</h2> : <PilotsList pilots={pilots} />}
+      {loadingPilots ? <h2>Loading...</h2> : <PilotsList pilots={pilots} pilotsNotReady={pilotsNotReady} />}
     </div>
   );
 }

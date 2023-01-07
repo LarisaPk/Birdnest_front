@@ -41,32 +41,36 @@ function PilotsList(props) {
       <Typography fontSize="xl" fontWeight="lg" align="center" margin="1em">
         Pilots who violated the NDZ perimeter for the past 10 minutes
       </Typography>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Last Name and First Name </StyledTableCell>
-              <StyledTableCell align="left">Email address</StyledTableCell>
-              <StyledTableCell align="left">Phone number</StyledTableCell>
-              <StyledTableCell align="left">Closest distance / meters</StyledTableCell>
-              <StyledTableCell align="left">Last seen / minutes ago</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {props.pilots.map((pilot) => (
-              <StyledTableRow key={pilot.pilotId}>
-                <StyledTableCell component="th" scope="row">
-                  {pilot.lastName} {pilot.firstName}
-                </StyledTableCell>
-                <StyledTableCell align="left">{pilot.email}</StyledTableCell>
-                <StyledTableCell align="left">{pilot.phoneNumber}</StyledTableCell>
-                <StyledTableCell align="left">{round(pilot.closestDistance)}</StyledTableCell>
-                <StyledTableCell align="left">{Math.round(pilot.lastSeenMinAgo)}</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {props.pilotsNotReady ? (
+        <h2>No Pilots in NDZ info yet...</h2>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Last Name and First Name </StyledTableCell>
+                <StyledTableCell align="left">Email address</StyledTableCell>
+                <StyledTableCell align="left">Phone number</StyledTableCell>
+                <StyledTableCell align="left">Closest distance / meters</StyledTableCell>
+                <StyledTableCell align="left">Last seen / minutes ago</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {props.pilots.map((pilot) => (
+                <StyledTableRow key={pilot.pilotId}>
+                  <StyledTableCell component="th" scope="row">
+                    {pilot.lastName} {pilot.firstName}
+                  </StyledTableCell>
+                  <StyledTableCell align="left">{pilot.email}</StyledTableCell>
+                  <StyledTableCell align="left">{pilot.phoneNumber}</StyledTableCell>
+                  <StyledTableCell align="left">{round(pilot.closestDistance)}</StyledTableCell>
+                  <StyledTableCell align="left">{Math.round(pilot.lastSeenMinAgo)}</StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </>
   );
 }
