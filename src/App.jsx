@@ -33,14 +33,26 @@ function App() {
         return data;
       }
     } catch (e) {
+      // cancel a ongoing GET request with axios
       if (axios.isCancel(e)) {
         console.log("successfully aborted");
       } else if (e.response.data.error === "pilots data is not ready yet") {
         setPilotsNotReady(true);
+        // SetState will trigger another UseEffect hook, so data eventually will be available without manual page reload.
+        SetState([]);
         console.log(e);
         console.log(e.response.data.error);
         return e.response.data.error;
-      }
+      } else if (e.response.data.error === "all drones data is not ready yet") {
+        SetState([]);
+        console.log(e);
+        console.log(e.response.data.error);
+        return e.response.data.error;
+      } else
+        (e) => {
+          console.log(e);
+          return e.response.data.error;
+        };
     }
   };
 
@@ -88,19 +100,26 @@ function App() {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    // fetching data after state changes with 2 seconds delay
+    // To be able to set loading to false whed data is ready (if was not ready on first render)
+    async function asyncCall() {
+      const drones = await fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
+      if (drones && loadingDrones) {
+        setLoadingDrones(false);
+      }
+    }
+    // Fetching data after state changes with 2 seconds delay
+    // This way we wait until promise resolves before making another api call.
+    // If we used setinterval instead of setTimeout
+    // it would send requests regardless if the previous one was resolved or not. Bad for slow internet connection.
     let timer = setTimeout(() => {
-      fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
+      asyncCall();
     }, 2000);
 
     return () => {
-      // cancel the subscription
-      // It will not try to update the state on an unmounted component
       isApiSubscribed = false;
       // clear the timer to avoid memory leaks
       // (if the component unmounts before the timer expires)
       clearTimeout(timer);
-      // cancel the request before component unmounts
       source.cancel();
     };
   }, [allDrones]);
@@ -115,20 +134,22 @@ function App() {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
+    async function asyncCall() {
+      const pilots = await fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
+      if (pilots && loadingPilots) {
+        setLoadingPilots(false);
+      }
+    }
+
     // fetching data after state changes with 10 seconds delay
     // (Should be enough to get regular updates for the pilots list. If needed more often, decrease timeout)
     let timer = setTimeout(() => {
-      fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
+      asyncCall();
     }, 10000);
 
     return () => {
-      // cancel the subscription
-      // It will not try to update the state on an unmounted component
       isApiSubscribed = false;
-      // clear the timer to avoid memory leaks
-      // (if the component unmounts before the timer expires)
       clearTimeout(timer);
-      // cancel the request before component unmounts
       source.cancel();
     };
   }, [pilots]);

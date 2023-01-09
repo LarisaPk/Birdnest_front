@@ -41,7 +41,7 @@ function PilotsList(props) {
       <Typography fontSize="xl" fontWeight="lg" align="center" margin="1em">
         Pilots who violated the NDZ perimeter for the past 10 minutes
       </Typography>
-      {props.pilotsNotReady ? (
+      {props.pilotsNotReady || props.pilots.length == 0 ? (
         <h2>No Pilots in NDZ info yet...</h2>
       ) : (
         <TableContainer component={Paper}>
