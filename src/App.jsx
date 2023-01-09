@@ -17,6 +17,8 @@ function App() {
   const [loadingPilots, setLoadingPilots] = React.useState(false);
   const [loadingDrones, setLoadingDrones] = React.useState(false);
   const [pilotsNotReady, setPilotsNotReady] = React.useState(false); // when there is no pilots in NDZ. for ex. on first render
+  const [pilotsNotReadyCounter, setPilotsNotReadyCounter] = React.useState(0);
+  const [dronesNotReadyCounter, setDronesNotReadyCounter] = React.useState(0);
 
   // Generic function for fetching data and settitng it to state
   const fetchData = async (url, source, isApiSubscribed, SetState) => {
@@ -38,13 +40,14 @@ function App() {
         console.log("successfully aborted");
       } else if (e.response.data.error === "pilots data is not ready yet") {
         setPilotsNotReady(true);
-        // SetState will trigger another UseEffect hook, so data eventually will be available without manual page reload.
-        SetState([]);
+        setPilotsNotReadyCounter(pilotsNotReadyCounter + 1);
+        console.log(pilotsNotReadyCounter);
         console.log(e);
         console.log(e.response.data.error);
         return e.response.data.error;
       } else if (e.response.data.error === "all drones data is not ready yet") {
-        SetState([]);
+        setDronesNotReadyCounter(dronesNotReadyCounter + 1);
+        console.log(dronesNotReadyCounter);
         console.log(e);
         console.log(e.response.data.error);
         return e.response.data.error;
@@ -91,7 +94,7 @@ function App() {
     };
   }, []);
 
-  // Fires every time allDrones state changes
+  // Fires every time allDrones state changes or data is not available yet after first render
   React.useEffect(() => {
     console.log("Drones effect, state change");
 
@@ -122,9 +125,9 @@ function App() {
       clearTimeout(timer);
       source.cancel();
     };
-  }, [allDrones]);
+  }, [allDrones, dronesNotReadyCounter]);
 
-  // Fires every time pilots state changes
+  // Fires every time pilots state changes or data is not available yet after first render
   React.useEffect(() => {
     console.log("Pilots effect, state change");
     setPilotsNotReady(false);
@@ -152,7 +155,7 @@ function App() {
       clearTimeout(timer);
       source.cancel();
     };
-  }, [pilots]);
+  }, [pilots, pilotsNotReadyCounter]);
 
   return (
     <div>
