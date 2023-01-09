@@ -57,7 +57,7 @@ function PilotsList(props) {
             </TableHead>
             <TableBody>
               {props.pilots.map((pilot) => (
-                <StyledTableRow key={pilot.pilotId}>
+                <StyledTableRow key={pilot.droneSerialNumber}>
                   <StyledTableCell component="th" scope="row">
                     {pilot.lastName} {pilot.firstName}
                   </StyledTableCell>

@@ -41,13 +41,13 @@ function App() {
       } else if (e.response.data.error === "pilots data is not ready yet") {
         setPilotsNotReady(true);
         setPilotsNotReadyCounter(pilotsNotReadyCounter + 1);
-        console.log(pilotsNotReadyCounter);
+        console.log(pilotsNotReadyCounter, " attempts to get pilots data, not ready");
         console.log(e);
         console.log(e.response.data.error);
         return e.response.data.error;
       } else if (e.response.data.error === "all drones data is not ready yet") {
         setDronesNotReadyCounter(dronesNotReadyCounter + 1);
-        console.log(dronesNotReadyCounter);
+        console.log(dronesNotReadyCounter, " attempts to get drones data, not ready");
         console.log(e);
         console.log(e.response.data.error);
         return e.response.data.error;
