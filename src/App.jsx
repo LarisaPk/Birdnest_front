@@ -3,13 +3,11 @@ import Canvas from "./components/Canvas";
 import PilotsList from "./components/PilotsList";
 import axios from "axios";
 import "./App.css";
-/*Used for development:
-const DRONESAPI = "http://localhost:3001/api/drones/now";
-const PILOTSAPI = "http://localhost:3001/api/pilots";
-*/
 
-const DRONESAPI = "https://birdnest-backend.cyclic.app/api/drones/now";
-const PILOTSAPI = "https://birdnest-backend.cyclic.app/api/pilots";
+let api = {
+  drones: import.meta.env.VITE_DRONESAPI,
+  pilots: import.meta.env.VITE_PILOTSAPI,
+};
 
 function App() {
   const [allDrones, setAllDrones] = React.useState([]);
@@ -74,11 +72,11 @@ function App() {
 
     // To be able to set loading to false whed data is ready
     async function asyncCall() {
-      const drones = await fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
+      const drones = await fetchData(api.drones, source, isApiSubscribed, setAllDrones);
       if (drones) {
         setLoadingDrones(false);
       }
-      const pilots = await fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
+      const pilots = await fetchData(api.pilots, source, isApiSubscribed, setPilots);
       if (pilots) {
         setLoadingPilots(false);
       }
@@ -105,7 +103,7 @@ function App() {
 
     // To be able to set loading to false whed data is ready (if was not ready on first render)
     async function asyncCall() {
-      const drones = await fetchData(DRONESAPI, source, isApiSubscribed, setAllDrones);
+      const drones = await fetchData(api.drones, source, isApiSubscribed, setAllDrones);
       if (drones && loadingDrones) {
         setLoadingDrones(false);
       }
@@ -138,7 +136,7 @@ function App() {
     const source = CancelToken.source();
 
     async function asyncCall() {
-      const pilots = await fetchData(PILOTSAPI, source, isApiSubscribed, setPilots);
+      const pilots = await fetchData(api.pilots, source, isApiSubscribed, setPilots);
       if (pilots && loadingPilots) {
         setLoadingPilots(false);
       }
