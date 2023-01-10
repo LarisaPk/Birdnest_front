@@ -5,8 +5,8 @@ import axios from "axios";
 import "./App.css";
 
 let api = {
-  drones: process.env.DRONESAPI || import.meta.env.VITE_DRONESAPI,
-  pilots: process.env.PILOTSAPI || import.meta.env.VITE_PILOTSAPI,
+  drones: import.meta.env.VITE_DRONESAPI,
+  pilots: import.meta.env.VITE_PILOTSAPI,
 };
 
 function App() {
