@@ -13,6 +13,7 @@ Project for the Reaktor Developer Trainee, summer 2023 application. Frontend.
 - [Installation](#installing)
 - [Usage](#usage)
 - [Deployed version](#deployed)
+- [Screenshot](#screenshot)
 - [Author](#author)
 
 ## About
@@ -110,6 +111,9 @@ If there is no data yet available it will indicate about it. Just wait a bit...
 Deployed version can be found here : https://birdnest-frontend.netlify.app/<br />
 
 It works with backend deployed on cyclic.sh and it's limitations are described in the backend README file.
+
+## Screenshot
+<img width="994" alt="Screenshot 2023-01-17 at 11 52 33" src="https://user-images.githubusercontent.com/42982515/212866348-cbe5376b-853b-4a48-a12f-979fabd668cf.png">
 
 ## Author
 
