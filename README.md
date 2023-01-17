@@ -67,7 +67,7 @@ How data is fetched:
 - All drones data then fetched every time when state changes, with 2 seconds timeout.
 - Pilots info data is fetched every time when state changes with 10 seconds timeout, since it is not nesessarylly needed to fetch it more often. It can be changed if needed.
 
-No new API calls created before old once get to be resolved or cancelled. To avoid having more requests in the queue that could be processd. For example if the Internet speed is slow. (Downside of this is that backend deployed on free service will not work with the desired frequency and will send fewer requests to the external API than it should. But this is what we get for free...)
+No new API calls created before old once get to be resolved or cancelled. To avoid having more requests in the queue that could be processd. For example if the Internet speed is slow. (In this case downside is that backend deployed on free service will not work with the desired frequency and will send fewer requests to the external API than it should. But this is what we get for free...) Try to test it locally, it is easy :).
 
 ## Getting Started
 
