@@ -33,7 +33,7 @@ function App() {
         return data;
       }
     } catch (e) {
-      // cancel a ongoing GET request with axios
+      // Cancel an ongoing GET request with axios
       if (axios.isCancel(e)) {
         console.log("successfully aborted");
       } else if (e.response.data.error === "pilots data is not ready yet") {
@@ -84,7 +84,7 @@ function App() {
     asyncCall();
 
     return () => {
-      // cancel the subscription
+      // Cancel the subscription
       // It will not try to update the state on an unmounted component
       isApiSubscribed = false;
       // cancel the request before component unmounts
@@ -118,7 +118,7 @@ function App() {
 
     return () => {
       isApiSubscribed = false;
-      // clear the timer to avoid memory leaks
+      // Clear the timer to avoid memory leaks
       // (if the component unmounts before the timer expires)
       clearTimeout(timer);
       source.cancel();
@@ -142,7 +142,7 @@ function App() {
       }
     }
 
-    // fetching data after state changes with 10 seconds delay
+    // Fetching data after state changes with 10 seconds delay
     // (Should be enough to get regular updates for the pilots list. If needed more often, decrease timeout)
     let timer = setTimeout(() => {
       asyncCall();

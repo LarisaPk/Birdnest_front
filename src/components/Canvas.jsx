@@ -12,7 +12,7 @@ function Canvas(props) {
   React.useEffect(() => {
     const canvas = document.getElementById("myCanvas");
     const context = canvas.getContext("2d");
-    // clear canvas before displaying new positions of the drones
+    // Clear canvas before displaying new positions of the drones
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     // Display no-fly zone
@@ -23,7 +23,7 @@ function Canvas(props) {
     // Display nest position - fill in the 5x5 pixel square at nest coordinates converted to meters
     //context.fillRect(nestPositionX / 1000, nestPositionY / 1000, 5, 5);
 
-    // set the canvas context's font-size and font-face
+    // Set the canvas context's font-size and font-face
     context.font = "1.5em Arial";
     context.fillText("🐣", nestPositionX / 1000, nestPositionY / 1000);
 
